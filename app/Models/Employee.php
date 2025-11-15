@@ -1,5 +1,4 @@
 <?php
-// app/Models/Employee.php
 
 namespace App\Models;
 
@@ -33,7 +32,7 @@ class Employee extends Model
     public function timesheets()
     {
         return $this->belongsToMany(Timesheet::class, 'timesheet_employees')
-            ->withPivot('days_data')
+            ->withPivot('days_data', 'hours_data', 'row_color')
             ->withTimestamps();
     }
 }

@@ -18,8 +18,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->name('timesheets.bulk-add-employees');
     Route::delete('timesheets/{timesheet}/employees/{employee}', [TimesheetController::class, 'removeEmployee'])
         ->name('timesheets.remove-employee');
+
+    // New routes for enhanced functionality
     Route::post('timesheets/{timesheet}/employees/{employee}/update-day', [TimesheetController::class, 'updateDayData'])
         ->name('timesheets.update-day-data');
+    Route::post('timesheets/{timesheet}/employees/{employee}/update-row-color', [TimesheetController::class, 'updateRowColor'])
+        ->name('timesheets.update-row-color');
+    Route::post('timesheets/{timesheet}/bulk-update-days', [TimesheetController::class, 'bulkUpdateDays'])
+        ->name('timesheets.bulk-update-days');
 });
 
 // Redirect to admin

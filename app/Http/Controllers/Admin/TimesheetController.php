@@ -47,7 +47,16 @@ class TimesheetController extends Controller
         $employees = Employee::where('is_active', true)->get();
         $timesheet->load('employees');
 
-        return view('admin.timesheets.edit', compact('timesheet', 'employees'));
+        // Получаем статистику для каждого сотрудника
+        $employeeStats = [];
+        foreach ($timesheet->employees as $employee) {
+            $employeeStats[$employee->id] = $timesheet->getEmployeeStats($employee->id);
+        }
+
+        // Общая статистика по табелю
+        $totalStats = $timesheet->getTotalStats();
+
+        return view('admin.timesheets.edit', compact('timesheet', 'employees', 'employeeStats', 'totalStats'));
     }
 
     public function update(Request $request, Timesheet $timesheet)
@@ -109,20 +118,71 @@ class TimesheetController extends Controller
         return back()->with('success', 'Сотрудники массово добавлены в табель.');
     }
 
+    public function updateRowColor(Request $request, Timesheet $timesheet, Employee $employee)
+    {
+        $request->validate([
+            'color' => 'required|string|max:7'
+        ]);
+
+        $timesheet->employees()->updateExistingPivot($employee->id, [
+            'row_color' => $request->color
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function bulkUpdateDays(Request $request, Timesheet $timesheet)
+    {
+        $request->validate([
+            'employee_ids' => 'required|array',
+            'employee_ids.*' => 'exists:employees,id',
+            'days' => 'required|array',
+            'days.*' => 'integer|min:1',
+            'status' => 'required|string|max:2',
+            'hours' => 'nullable|numeric|min:0|max:24'
+        ]);
+
+        foreach ($request->employee_ids as $employeeId) {
+            $pivot = $timesheet->employees()->where('employee_id', $employeeId)->first()->pivot;
+            $daysData = $pivot->days_data ? json_decode($pivot->days_data, true) : [];
+            $hoursData = $pivot->hours_data ? json_decode($pivot->hours_data, true) : [];
+
+            foreach ($request->days as $day) {
+                $daysData[$day] = $request->status;
+                if ($request->has('hours') && $request->hours !== '') {
+                    $hoursData[$day] = $request->hours;
+                }
+            }
+
+            $timesheet->employees()->updateExistingPivot($employeeId, [
+                'days_data' => json_encode($daysData),
+                'hours_data' => json_encode($hoursData)
+            ]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
     public function updateDayData(Request $request, Timesheet $timesheet, Employee $employee)
     {
         $request->validate([
             'day' => 'required|integer|min:1',
-            'value' => 'required|string|max:2'
+            'status' => 'required|string|max:2',
+            'hours' => 'nullable|numeric|min:0|max:24'
         ]);
 
         $pivot = $timesheet->employees()->where('employee_id', $employee->id)->first()->pivot;
         $daysData = $pivot->days_data ? json_decode($pivot->days_data, true) : [];
+        $hoursData = $pivot->hours_data ? json_decode($pivot->hours_data, true) : [];
 
-        $daysData[$request->day] = $request->value;
+        $daysData[$request->day] = $request->status;
+        if ($request->has('hours') && $request->hours !== '') {
+            $hoursData[$request->day] = $request->hours;
+        }
 
         $timesheet->employees()->updateExistingPivot($employee->id, [
-            'days_data' => json_encode($daysData)
+            'days_data' => json_encode($daysData),
+            'hours_data' => json_encode($hoursData)
         ]);
 
         return response()->json(['success' => true]);

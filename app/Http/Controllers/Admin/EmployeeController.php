@@ -9,10 +9,14 @@ use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index(Request $request)
     {
         $query = Employee::query();
 
+        // Поиск
         if ($request->has('search') && $request->search) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -23,6 +27,7 @@ class EmployeeController extends Controller
             });
         }
 
+        // Фильтрация по статусу
         if ($request->has('status') && $request->status !== '') {
             $query->where('is_active', $request->status);
         }
@@ -32,11 +37,17 @@ class EmployeeController extends Controller
         return view('admin.employees.index', compact('employees'));
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
         return view('admin.employees.create');
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -55,16 +66,25 @@ class EmployeeController extends Controller
             ->with('success', 'Сотрудник успешно создан.');
     }
 
+    /**
+     * Display the specified resource.
+     */
     public function show(Employee $employee)
     {
         return view('admin.employees.show', compact('employee'));
     }
 
+    /**
+     * Show the form for editing the specified resource.
+     */
     public function edit(Employee $employee)
     {
         return view('admin.employees.edit', compact('employee'));
     }
 
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, Employee $employee)
     {
         $validated = $request->validate([
@@ -83,6 +103,9 @@ class EmployeeController extends Controller
             ->with('success', 'Данные сотрудника обновлены.');
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(Employee $employee)
     {
         $employee->delete();
