@@ -3,11 +3,19 @@
 @section('title', 'Добавить сотрудника')
 
 @section('content')
-    <div class="max-w-3xl mx-auto">
-        <div class="bg-white rounded-lg shadow-md">
-            <div class="px-6 py-4 border-b border-gray-200">
-                <h2 class="text-xl font-semibold">Добавить сотрудника</h2>
-            </div>
+    <div class="flex justify-between items-center">
+        <h2 class="text-xl font-semibold">Сотрудники</h2>
+        <div class="flex space-x-2">
+            <a href="{{ route('admin.employees.export.excel') }}"
+               class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                <i class="fas fa-file-excel mr-2"></i>Экспорт в Excel
+            </a>
+            <a href="{{ route('admin.employees.create') }}"
+               class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                <i class="fas fa-plus mr-2"></i>Добавить сотрудника
+            </a>
+        </div>
+    </div>
 
             <form action="{{ route('admin.employees.store') }}" method="POST" class="p-6">
                 @csrf
@@ -64,13 +72,27 @@
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Должность *</label>
-                        <input type="text" name="position" value="{{ old('position') }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               required>
-                        @error('position')
+                        <select name="position_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="">Выберите должность</option>
+                            @foreach($positions as $position)
+                                <option value="{{ $position->id }}" {{ old('position_id', $employee->position_id ?? '') == $position->id ? 'selected' : '' }}>
+                                    {{ $position->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('position_id')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Дата приема на работу</label>
+                    <input type="date" name="employment_date" value="{{ old('employment_date') }}"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    @error('employment_date')
+                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="mt-6">

@@ -7,10 +7,16 @@
         <div class="px-6 py-4 border-b border-gray-200">
             <div class="flex justify-between items-center">
                 <h2 class="text-xl font-semibold">Табели рабочего времени</h2>
-                <a href="{{ route('admin.timesheets.create') }}"
-                   class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                    <i class="fas fa-plus mr-2"></i>Создать табель
-                </a>
+                <div class="flex space-x-2">
+                    <a href="{{ route('admin.timesheets.export.excel') }}"
+                       class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                        <i class="fas fa-file-excel mr-2"></i>Экспорт в Excel
+                    </a>
+                    <a href="{{ route('admin.timesheets.create') }}"
+                       class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                        <i class="fas fa-plus mr-2"></i>Создать табель
+                    </a>
+                </div>
             </div>
         </div>
 

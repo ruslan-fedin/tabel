@@ -9,7 +9,7 @@
                 <h2 class="text-xl font-semibold">Редактирование: {{ $employee->full_name }}</h2>
             </div>
 
-            <form action="{{ route('admin.employees.update', $employee) }}" method="POST" class="p-6">
+            <form action="{{ route('admin.employees.update', $employee) }}" method="POST" class="p-6" id="employeeForm">
                 @csrf
                 @method('PUT')
 
@@ -44,6 +44,21 @@
                     </div>
 
                     <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Должность *</label>
+                        <select name="position_id" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="">Выберите должность</option>
+                            @foreach($positions as $position)
+                                <option value="{{ $position->id }}" {{ old('position_id', $employee->position_id) == $position->id ? 'selected' : '' }}>
+                                    {{ $position->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('position_id')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Дата рождения *</label>
                         <input type="date" name="birth_date" value="{{ old('birth_date', $employee->birth_date->format('Y-m-d')) }}"
                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -54,21 +69,21 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Телефон *</label>
-                        <input type="tel" name="phone" value="{{ old('phone', $employee->phone) }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               required>
-                        @error('phone')
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Дата приема на работу</label>
+                        <input type="date" name="employment_date" value="{{ old('employment_date', $employee->employment_date ? $employee->employment_date->format('Y-m-d') : '') }}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        @error('employment_date')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Должность *</label>
-                        <input type="text" name="position" value="{{ old('position', $employee->position) }}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Телефон *</label>
+                        <input type="tel" name="phone" value="{{ old('phone', $employee->formatted_phone) }}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 phone-mask"
+                               placeholder="+7 (___) ___-__-__"
                                required>
-                        @error('position')
+                        @error('phone')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
@@ -97,3 +112,20 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            // Маска для телефона
+            $('.phone-mask').mask('+7 (000) 000-00-00');
+
+            // При отправке формы убираем маску
+            $('#employeeForm').on('submit', function() {
+                var phone = $('.phone-mask');
+                phone.val(phone.val().replace(/\D/g, ''));
+            });
+        });
+    </script>
+@endpush

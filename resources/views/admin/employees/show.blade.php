@@ -45,6 +45,15 @@
                                 <dt class="text-sm font-medium text-gray-500">Должность</dt>
                                 <dd class="mt-1 text-sm text-gray-900">{{ $employee->position }}</dd>
                             </div>
+                            <div>
+                                <dt class="text-sm font-medium text-gray-500">Статус</dt>
+                                <dd class="mt-1">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
+                                    {{ $employee->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
+                                    {{ $employee->is_active ? 'Активный' : 'Неактивный' }}
+                                </span>
+                                </dd>
+                            </div>
                         </dl>
                     </div>
 
@@ -54,7 +63,7 @@
                         <dl class="space-y-3">
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Телефон</dt>
-                                <dd class="mt-1 text-sm text-gray-900">{{ $employee->phone }}</dd>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $employee->formatted_phone }}</dd>
                             </div>
                             <div>
                                 <dt class="text-sm font-medium text-gray-500">Дата рождения</dt>
@@ -65,14 +74,15 @@
                                 <dd class="mt-1 text-sm text-gray-900">{{ $employee->birth_date->age }} лет</dd>
                             </div>
                             <div>
-                                <dt class="text-sm font-medium text-gray-500">Статус</dt>
-                                <dd class="mt-1">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                    {{ $employee->is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    {{ $employee->is_active ? 'Активный' : 'Неактивный' }}
-                                </span>
-                                </dd>
+                                <dt class="text-sm font-medium text-gray-500">Дата приема на работу</dt>
+                                <dd class="mt-1 text-sm text-gray-900">{{ $employee->employment_date->format('d.m.Y') }}</dd>
                             </div>
+                            @if($employee->work_experience)
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Стаж работы</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">{{ $employee->work_experience }}</dd>
+                                </div>
+                            @endif
                         </dl>
                     </div>
                 </div>
